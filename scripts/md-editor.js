@@ -8,7 +8,17 @@ const STYLE =
 	font-family: "Consolas", monospace;
 	font-size: 16pt;
 	tab-size: 4;
-}`;
+}
+
+.md-keyword { color: #93C763; }
+.md-type { color: #678CB1; }
+.md-meta { color: #A082BD; }
+.md-comment { color: #7D8C93; }
+.md-symbol { color: #E8E2B7; }
+.md-number { color: #FFCD22; }
+.md-string { color: #EC7600; }
+.md-error { color: #BC3F3C; }
+`;
 
 const TAB_KEY = 9;
 
@@ -16,7 +26,7 @@ class MdEditor extends HTMLElement {
 
 	constructor() {
 		super();
-		this.time = new Date();
+		this.listeners = [];
 
 		let panel = document.createElement('div');
 		panel.classList.add('md-editor');
@@ -34,7 +44,9 @@ class MdEditor extends HTMLElement {
 
 		button.addEventListener('click', (event) => {
 			let scanner = new MdScanner();
-			console.log(scanner.parse(panel.innerText));
+			let tokens = scanner.parse(panel.innerText); 
+			console.log(tokens);
+			panel.innerHTML = mark(tokens);
 		});
 
 		let style = document.createElement('style');

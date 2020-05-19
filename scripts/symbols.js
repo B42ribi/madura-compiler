@@ -9,6 +9,11 @@ const BLOCK = 123;
 const DEL = 127;
 const NBSP = 160;
 
+const PLUS = 43;
+const MINUS = 45;
+const TIMES = 42;
+const DIV = 47;
+
 const UPPER_A = 65;
 const UPPER_B = 66;
 const UPPER_C = 67;

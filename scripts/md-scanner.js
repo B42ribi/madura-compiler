@@ -180,6 +180,7 @@ class MdScanner {
 		let c = data[start];
 		if (c === QUOTE) { return this.consumeString(data, start, QUOTE); }
 		if (c === CHAR) { return this.consumeString(data, start, CHAR); }
+		if (c === DIV && data[start + 1] === DIV) { return this.consumeComment(data, start); }
 
 		return new Token(TokenType.OPERATOR, asString(data, start, start + 1));
 	}
@@ -192,6 +193,11 @@ class MdScanner {
 		}
 
 		return new Token(TokenType.STRING, asString(data, start, pos));
+	}
+
+	consumeComment(data, start) {
+		for (var pos = start + 2; pos < data.length && data[pos] !== LF; ++pos);
+		return new Token(TokenType.COMMENT, asString(data, start, pos));
 	}
 
 	consumeNumber(data, start) {
@@ -210,7 +216,7 @@ class MdScanner {
 					if (c === LOWER_X) { state = STATE_X; break; }
 					if (c === LOWER_B) { state = STATE_B; break; }
 					if (c === UPPER_L || c === LOWER_I) { return new Token(TokenType.NUMBER, asString(data, start, pos + 1)); }
-					return new Token(TokenType.NUMBER, "0");
+					return new Token(TokenType.NUMBER, '0');
 				case STATE_INTEGER:
 					if (c >= DIGIT_0 && c <= DIGIT_9) { break; }
 					if (c === DOT) { state = STATE_DOT; break; }
@@ -263,7 +269,7 @@ class MdScanner {
 					switch (c) {
 						case SPACE:
 						case TAB: state = STATE_WHITESPACE; break;
-						case LF: return new Token(TokenType.LINEBREAK, "\n");
+						case LF: return new Token(TokenType.LINEBREAK, '\n');
 						case CR: state = STATE_CR; break;
 						default: return new Token(TokenType.CONTROL, asString(data, start, pos));
 					}
@@ -277,8 +283,8 @@ class MdScanner {
 					break;
 				case STATE_CR:
 					switch (c) {
-						case LF: return new Token(TokenType.LINEBREAK, "\r\n");
-						default: return new Token(TokenType.LINEBREAK, "\r");
+						case LF: return new Token(TokenType.LINEBREAK, '\r\n');
+						default: return new Token(TokenType.LINEBREAK, '\r');
 					}
 			}
 		}
@@ -291,7 +297,7 @@ class MdScanner {
 
 	consume(data, start) {
 		for (var pos = start + 1; pos < data.length && data[pos] > DEL; ++pos);
-		return Token(TokenType.INVALID, asString(data, start, pos - start));
+		return new Token(TokenType.INVALID, asString(data, start, pos));
 	}
 }
 
