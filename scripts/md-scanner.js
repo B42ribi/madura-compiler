@@ -98,7 +98,7 @@ class MdScanner {
 					case LOWER_H: if (trd >= data.length) { break; }
 						switch (data[trd]) {
 							case LOWER_I: return this.matchOrConsume(KEYWORD_THIS, data, start);
-							case LOWER_O: return this.matchOrConsume(KEYWORD_THROW, data, start);
+							case LOWER_R: return this.matchOrConsume(KEYWORD_THROW, data, start);
 						} break;
 					case LOWER_R: if (trd >= data.length) { break; }
 						switch (data[trd]) {
@@ -123,7 +123,7 @@ class MdScanner {
 	}
 
 	matchOrConsume(template, data, start, extension) {
-		for (var i = 2, pos = start + 2; i < template.length && pos < data.length && (template[i] === data[pos]); ++i, ++pos);
+		for (var i = 0, pos = start; i < template.length && pos < data.length && (template[i] === data[pos]); ++i, ++pos);
 		if (i === template.length && !this.match(data, pos)) { return new Token(TokenType.KEYWORD, asString(data, start, pos)); }
 		if (extension) {
 			for (; i < extension.length && pos < data.length && (extension[i] === data[pos]); ++i, ++pos);

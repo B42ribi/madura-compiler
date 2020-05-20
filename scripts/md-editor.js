@@ -46,10 +46,13 @@ class MdEditor extends HTMLElement {
 		});
 
 		button.addEventListener('click', (event) => {
+			let start = new Date();
 			let scanner = new MdScanner();
 			let tokens = scanner.parse(panel.innerText);
-			console.log(tokens);
 			panel.innerHTML = mark(tokens);
+			let end = new Date();
+			console.log(`${end.getTime() - start.getTime()} ms`);
+			console.log(tokens);
 		});
 
 		let style = document.createElement('style');
