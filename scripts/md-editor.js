@@ -1,4 +1,4 @@
-(function() {
+(function () {
 
 const STYLE =
 `.md-editor {
@@ -21,30 +21,33 @@ const STYLE =
 `;
 
 const TAB_KEY = 9;
+const BACKSPACE = 8;
 
 class MdEditor extends HTMLElement {
 
 	constructor() {
 		super();
-		this.listeners = [];
 
 		let panel = document.createElement('div');
 		panel.classList.add('md-editor');
 		panel.contentEditable = true;
-		
+
 		let button = document.createElement('button');
 		button.innerHTML = "Parse";
 
 		panel.addEventListener('keydown', (event) => {
-			if (event.which === TAB_KEY) {
-				event.preventDefault();
-				document.execCommand('insertText', false, '\t');
+			switch (event.which) {
+				case BACKSPACE: break;
+				case TAB_KEY:
+					event.preventDefault();
+					document.execCommand('insertText', false, '    ');
+					break;
 			}
 		});
 
 		button.addEventListener('click', (event) => {
 			let scanner = new MdScanner();
-			let tokens = scanner.parse(panel.innerText); 
+			let tokens = scanner.parse(panel.innerText);
 			console.log(tokens);
 			panel.innerHTML = mark(tokens);
 		});
@@ -52,7 +55,7 @@ class MdEditor extends HTMLElement {
 		let style = document.createElement('style');
 		style.innerHTML = STYLE;
 
-		let shadowRoot = this.attachShadow({mode: 'closed'});
+		let shadowRoot = this.attachShadow({ mode: 'closed' });
 		shadowRoot.appendChild(style);
 		shadowRoot.appendChild(panel);
 		shadowRoot.appendChild(button);

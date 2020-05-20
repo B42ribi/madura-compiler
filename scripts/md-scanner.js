@@ -25,6 +25,7 @@ class MdScanner {
 		while (pos < data.length) {
 			let c = data[pos];
 			let token =
+				c === NBSP ? this.consumeNonPrintable(data, pos) :
 				c > DEL ? this.consume(data, pos) :
 				c >= BLOCK ? this.consumeSymbolOrOperator(data, pos) :
 				c >= LOWER_A ? this.consumeNameOrKeyword(data, pos) :
@@ -268,6 +269,7 @@ class MdScanner {
 				case STATE_INITIAL:
 					switch (c) {
 						case SPACE:
+						case NBSP:
 						case TAB: state = STATE_WHITESPACE; break;
 						case LF: return new Token(TokenType.LINEBREAK, '\n');
 						case CR: state = STATE_CR; break;
@@ -277,6 +279,7 @@ class MdScanner {
 				case STATE_WHITESPACE:
 					switch (c) {
 						case SPACE:
+						case NBSP:
 						case TAB: break;
 						default: return new Token(TokenType.WHITESPACE, asString(data, start, pos));
 					}
@@ -307,10 +310,7 @@ function asString(data, start, end) {
 
 function getChars(input) {
 	let data = []
-	for (let i = 0; i < input.length; ++i) {
-		let code = input.charCodeAt(i);
-		data.push(code === NBSP ? SPACE : code);
-	}
+	for (let i = 0; i < input.length; ++i) { data.push(input.charCodeAt(i)); }
 	return data;
 }
 
