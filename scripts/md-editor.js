@@ -62,11 +62,27 @@
 	function createLine(panel, text) {
 		let line = document.createElement('line');
 		let span = document.createElement('span');
-		let space = document.createTextNode(text);
-		span.appendChild(space);
+		let node = document.createTextNode(text);
+
+		span.appendChild(node);
 		line.appendChild(span);
-		panel.appendChild(line);
+
+		let selected = getSelectedLine();
+
+		if (selected != null && selected.nextSibling != null) {
+			panel.insertBefore(line, selected.nextSibling);
+		} else {
+			panel.appendChild(line);
+		}
+
 		setSelection(span.firstChild, 0);
+	}
+
+	function getSelectedLine() {
+		let sel = window.getSelection();
+		let node = sel.anchorNode;
+		while (node != null && node.tagName != 'LINE') { node = node.parentNode; }
+		return node;
 	}
 
 	function setSelection(anchor, offset) {
