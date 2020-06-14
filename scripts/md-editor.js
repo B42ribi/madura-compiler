@@ -41,8 +41,8 @@
 			let root = isFirefox ? window : shadowRoot
 
 			hidden[this] = {
-				getSelection: () => getSelection(root),
-				setSelection: (anchor, offset) => setSelection(root, anchor, offset),
+				getPosition: () => getPosition(root),
+				setPosition: (line, index) => setPosition(root, line, index),
 				createLine: (text) => createLine(root, panel, text)
 			};
 		}
@@ -55,14 +55,35 @@
 
 	customElements.define('md-editor', MdEditor);
 
-	function getSelectedLine(root) {
+	function getPosition(root) {
 		let sel = root.getSelection();
-		let node = sel.anchorNode;
-		while (node != null && node.tagName != 'LINE') { node = node.parentNode; }
-		return node;
+		let anchor = sel.anchorNode;
+		while (anchor && anchor.tagName != 'SPAN') { anchor = anchor.parentNode; }
+		if (anchor == null) return null;
+		let line = anchor.parentNode;
+
+		let tokens = line.getElementsByTagName('SPAN');
+		let index = 0;
+		let t = 0;
+		while (tokens[t] !== anchor) {
+			index += tokens[t].innerText.length;
+			++t;
+		}
+		index += sel.anchorOffset;
+
+		return { line: line, index: index };
 	}
 
-	function setSelection(root, anchor, offset) {
+	function setPosition(root, line, index) {
+		let tokens = line.getElementsByTagName('SPAN');
+		let offset = index;
+		let t = 0;
+		while (index >= tokens[t].innerText.length) {
+			index -= tokens[t].innerText.length;
+			++t;
+		}
+
+		let anchor = tokens[t].firstChild;
 		let range = document.createRange();
 		let sel = root.getSelection();
 		range.setStart(anchor, offset);
@@ -80,15 +101,15 @@
 		span.appendChild(node);
 		line.appendChild(span);
 
-		let selected = getSelectedLine(root);
+		let position = getPosition(root);
 
-		if (selected != null && selected.nextSibling != null) {
-			panel.insertBefore(line, selected.nextSibling);
+		if (position && position.line && position.line.nextSibling) {
+			panel.insertBefore(line, position.line.nextSibling);
 		} else {
 			panel.appendChild(line);
 		}
 
-		setSelection(root, span.firstChild, 0);
+		setPosition(root, line, 0);
 	}
 
 })();
