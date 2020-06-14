@@ -15,11 +15,13 @@
 			panel.classList.add('md-editor');
 			panel.contentEditable = true;
 
+			panel.appendChild(createLine('Void main() => println("Hello world!")'));
+
 			panel.addEventListener('keydown', (event) => {
 				switch (event.key) {
 					case ENTER:
 						event.preventDefault();
-						hidden[this].createLine('\xA0');
+						hidden[this].lineBreak();
 						break;
 					case TAB_KEY:
 						event.preventDefault();
@@ -43,25 +45,22 @@
 			hidden[this] = {
 				getPosition: () => getPosition(root),
 				setPosition: (line, index) => setPosition(root, line, index),
-				createLine: (text) => createLine(root, panel, text)
+				lineBreak: () => lineBreak(root, panel)
 			};
 		}
-
-		connectedCallback() {
-			hidden[this].createLine('Void main() => println("Hello world!")');
-		}
-
 	}
 
 	customElements.define('md-editor', MdEditor);
 
 	function getPosition(root) {
+		// determine selected line
 		let sel = root.getSelection();
 		let anchor = sel.anchorNode;
 		while (anchor && anchor.tagName != 'SPAN') { anchor = anchor.parentNode; }
-		if (anchor == null) return null;
+		if (!anchor) { return null; }
 		let line = anchor.parentNode;
 
+		// determine selected index
 		let tokens = line.getElementsByTagName('SPAN');
 		let index = 0;
 		let t = 0;
@@ -93,23 +92,47 @@
 		sel.addRange(range);
 	}
 
-	function createLine(root, panel, text) {
+	function lineBreak(root, panel) {
+		let position = getPosition(root);
+		if (!position) { throw 'no line selected to apply linebreak to'; }
+
+		let selected = position.line;
+		let line = document.createElement('LINE');
+		let breakPoint = position.index;
+
+		switch (breakPoint) {
+			case 0:
+				line.innerHTML = selected.innerHTML;
+				selected.innerHTML = '<span>\xA0</span>';
+				break;
+			case selected.innerText.length:
+				line.innerHTML = '<span>\xA0</span>';
+				break;
+			default:
+				let text = selected.innerText;
+				selected.innerHTML = `<span>${text.substring(0, breakPoint)}</span>`;
+				line.innerHTML = `<span>${text.substring(breakPoint, text.length)}</span>`;
+		}
+
+		let nextLine = selected.nextSibling;
+		if (nextLine) {
+			panel.insertBefore(line, nextLine);
+		} else {
+			panel.appendChild(line);
+		}
+
+		setPosition(root, line, 0);
+
+	}
+
+	function createLine(text) {
 		let line = document.createElement('LINE');
 		let span = document.createElement('SPAN');
 		let node = document.createTextNode(text);
 
 		span.appendChild(node);
 		line.appendChild(span);
-
-		let position = getPosition(root);
-
-		if (position && position.line && position.line.nextSibling) {
-			panel.insertBefore(line, position.line.nextSibling);
-		} else {
-			panel.appendChild(line);
-		}
-
-		setPosition(root, line, 0);
+		return line;
 	}
 
 })();
