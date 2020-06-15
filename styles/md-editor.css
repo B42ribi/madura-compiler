@@ -1,7 +1,7 @@
 .md-editor {
 	background-color: #293134;
 	color: #E0E2E4;
-	padding: 10px;
+	padding: 10px 10px 10px 0;
 	font-family: "Consolas", monospace;
 	font-size: 16pt;
 }
@@ -22,7 +22,7 @@ line::before {
 	counter-increment: line-counter;
 	content: counter(line-counter);
 	display: inline-block;
-	width: 64px;
+	width: 80px;
 	text-align: center;
 	color: #7D8C93;
 }

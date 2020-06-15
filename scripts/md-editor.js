@@ -6,6 +6,17 @@
 	const TAB_KEY = 'Tab';
 	const BACKSPACE = 'Backspace';
 
+	const SHIFT = 'Shift'
+	const CONTROL = 'Control'
+	const ALT = 'Alt'
+
+	const LEFT = 'ArrowLeft';
+	const RIGHT = 'ArrowRight';
+	const UP = 'ArrowUp';
+	const DOWN = 'ArrowDown';
+	const START = 'Home';
+	const END = 'End';
+
 	class MdEditor extends HTMLElement {
 
 		constructor() {
@@ -15,9 +26,8 @@
 			panel.classList.add('md-editor');
 			panel.contentEditable = true;
 
-			panel.appendChild(createLine('Void main() => println("Hello world!")'));
-
 			panel.addEventListener('keydown', (event) => {
+				let position;
 				switch (event.key) {
 					case ENTER:
 						event.preventDefault();
@@ -25,13 +35,42 @@
 						break;
 					case TAB_KEY:
 						event.preventDefault();
-						document.execCommand('insertText', false, '    ');
+						position = hidden[this].getPosition();
+						document.execCommand('insertText', false, tabs(4 - (position.index % 4)));
 						break;
-					case BACKSPACE: break;
+					case BACKSPACE:
+						position = hidden[this].getPosition();
+						if (position.index === 0) {
+							event.preventDefault();
+							hidden[this].glueLines(position.line);
+						}
+						break;
 				}
 			});
 
-			let style = document.createElement('link');
+			panel.addEventListener('keyup', (event) => {
+				switch (event.key) {
+					case SHIFT:
+					case CONTROL:
+					case ALT:
+					case ENTER:
+					case LEFT:
+					case RIGHT:
+					case UP:
+					case DOWN:
+					case START:
+					case END: return;
+				}
+
+				if (hidden[this].timer) { window.clearTimeout(hidden[this].timer); }
+				hidden[this].timer = window.setTimeout(() => {
+					let position = hidden[this].getPosition();
+					hidden[this].markUp(position.line);
+					hidden[this].setPosition(position.line, position.index);
+				}, 10);
+			});
+
+			let style = document.createElement('LINK');
 			style.rel = 'stylesheet';
 			style.href = "styles/md-editor.css";
 
@@ -42,15 +81,34 @@
 			let isFirefox = navigator.userAgent.indexOf("Firefox") != -1;
 			let root = isFirefox ? window : shadowRoot
 
+			let scanner = new MdScanner();
+
 			hidden[this] = {
 				getPosition: () => getPosition(root),
 				setPosition: (line, index) => setPosition(root, line, index),
-				lineBreak: () => lineBreak(root, panel)
+				lineBreak: () => lineBreak(root, panel, scanner),
+				glueLines: (line) => glueLines(root, panel, scanner, line),
+				markUp: (line, text) => markUp(scanner, line, text)
 			};
+
+			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), '// implicit public and shared'));
+			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), 'Void main() => greet()'));
+			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), '\xA0'));
+			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), 'public shared Void greet() {'));
+			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), '\xA0 \xA0 I32 count = 100'));
+			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), '\xA0 \xA0 var message = "Hey x ${count}"'));
+			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), '\xA0 \xA0 println(message)'));
+			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), '}'));
 		}
 	}
 
 	customElements.define('md-editor', MdEditor);
+
+	function tabs(count) {
+		let data = [];
+		for (let i = 0; i < count; ++i) { data.push(' '); }
+		return data.join('');
+	}
 
 	function getPosition(root) {
 		// determine selected line
@@ -77,8 +135,8 @@
 		let tokens = line.getElementsByTagName('SPAN');
 		let offset = index;
 		let t = 0;
-		while (index >= tokens[t].innerText.length) {
-			index -= tokens[t].innerText.length;
+		while (offset > tokens[t].innerText.length) {
+			offset -= tokens[t].innerText.length;
 			++t;
 		}
 
@@ -92,7 +150,7 @@
 		sel.addRange(range);
 	}
 
-	function lineBreak(root, panel) {
+	function lineBreak(root, panel, scanner) {
 		let position = getPosition(root);
 		if (!position) { throw 'no line selected to apply linebreak to'; }
 
@@ -110,8 +168,8 @@
 				break;
 			default:
 				let text = selected.innerText;
-				selected.innerHTML = `<span>${text.substring(0, breakPoint)}</span>`;
-				line.innerHTML = `<span>${text.substring(breakPoint, text.length)}</span>`;
+				markUp(scanner, selected, text.substring(0, breakPoint));
+				markUp(scanner, line, text.substring(breakPoint, text.length));
 		}
 
 		let nextLine = selected.nextSibling;
@@ -122,16 +180,43 @@
 		}
 
 		setPosition(root, line, 0);
-
 	}
 
-	function createLine(text) {
-		let line = document.createElement('LINE');
-		let span = document.createElement('SPAN');
-		let node = document.createTextNode(text);
+	function glueLines(root, panel, scanner, line) {
+		let previousLine = line.previousSibling;
+		if (previousLine) {
+			let previousText = previousLine.innerText;
+			markUp(scanner, previousLine, `${previousText}${line.innerText}`);
+			panel.removeChild(line);
+			setPosition(root, previousLine, previousText.length);
+		}
+	}
 
-		span.appendChild(node);
-		line.appendChild(span);
+	function markUp(scanner, line, text) {
+		let tokens = scanner.parse(text ? text : line.innerText);
+		line.innerHTML = '';
+
+		for (let t of tokens) {
+			let token = document.createElement('span');
+			token.appendChild(document.createTextNode(t.data));
+			line.appendChild(token);
+
+			switch (t.type) {
+				case TokenType.KEYWORD: token.classList.add('md-keyword'); break;
+				case TokenType.TYPE: token.classList.add('md-type'); break;
+				case TokenType.NUMBER: token.classList.add('md-number'); break;
+				case TokenType.STRING: token.classList.add('md-string'); break;
+				case TokenType.OPERATOR:
+				case TokenType.ASSIGNMENT:
+				case TokenType.COMPARISON: token.classList.add('md-symbol'); break;
+				case TokenType.COMMENT:
+				case TokenType.SUBOPERATOR: token.classList.add('md-comment'); break;
+				case TokenType.CONSTANT:
+				case TokenType.META: token.classList.add('md-meta'); break;
+				case TokenType.INVALID: token.classList.add('md-error'); break;
+			}
+		}
+
 		return line;
 	}
 
