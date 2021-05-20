@@ -16,11 +16,11 @@ class MdScanner {
 			let c = data.charCodeAt(pos);
 			let token =
 				(c >= LOWER_A && c <= LOWER_Z) ? consumeNameOrKeyword(data, pos) :
-					(c >= UPPER_A && c <= UPPER_Z) ? consumeType(data, pos) :
-						(c >= DIGIT_0 && c <= DIGIT_9) ? consumeNumber(data, pos) :
-							(c >= NUL && c <= SPACE || c === NBSP || c === DEL) ? consumeNonPrintable(data, pos) :
-								(isSymbol(c)) ? consumeSymbolOrOperator(data, pos) :
-									token = consumeInvalid(data, pos);
+				(c >= UPPER_A && c <= UPPER_Z) ? consumeType(data, pos) :
+				(c >= DIGIT_0 && c <= DIGIT_9) ? consumeNumber(data, pos) :
+				(c >= NUL && c <= SPACE || c === NBSP || c === DEL) ? consumeNonPrintable(data, pos) :
+				(isSymbol(c)) ? consumeSymbolOrOperator(data, pos) :
+					token = consumeInvalid(data, pos);
 
 			pos += token.data.length;
 			tokens.push(token);
