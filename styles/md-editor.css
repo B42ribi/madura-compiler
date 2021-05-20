@@ -1,19 +1,23 @@
+body {
+	background-color: #272d2f;
+}
+
 .md-editor {
-	background-color: #293134;
-	color: #E0E2E4;
+	background-color: #1c2021;
+	color: #e0e2e4;
 	padding: 10px 10px 10px 0;
 	font-family: "Consolas", monospace;
 	font-size: 16pt;
 }
 
-.md-keyword { color: #93C763; }
-.md-type { color: #678CB1; }
-.md-meta { color: #A082BD; }
-.md-comment { color: #7D8C93; }
-.md-symbol { color: #E8E2B7; }
-.md-number { color: #FFCD22; }
-.md-string { color: #EC7600; }
-.md-error { color: #BC3F3C; }
+.md-keyword { color: #93c763; }
+.md-type { color: #678cb1; }
+.md-meta { color: #a082bd; }
+.md-comment { color: #616d73; }
+.md-symbol { color: #e0e2e4; }
+.md-number { color: #e3bd3d; }
+.md-string { color: #ce751d; }
+.md-error { color: #bc3f3c; }
 
 div { counter-reset: line-counter; }
 line { display: block; }
@@ -24,5 +28,5 @@ line::before {
 	display: inline-block;
 	width: 80px;
 	text-align: center;
-	color: #7D8C93;
+	color: #616d73;
 }
