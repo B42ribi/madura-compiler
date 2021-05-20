@@ -32,13 +32,15 @@ class MdScanner {
 }
 
 function consumeNameOrKeyword(data, start) {
-	let sequence = consume(data, start, c => isWordChar(c));
+	let sequence = match(data, /b'\\?[ -~]'/y, start);
+	if (sequence) return new Token(NUMBER, sequence);
+	sequence = match(data, /[a-z]\w*/y, start);
 	let type = ALLOWED_KEYWORDS.has(sequence) ? KEYWORD : NAME;
 	return new Token(type, sequence);
 }
 
 function consumeType(data, start) {
-	return new Token(TYPE, consume(data, start, c => isWordChar(c)));
+	return new Token(TYPE, match(data, /[A-Z]\w*/y, start));
 }
 
 function consumeNumber(data, start) {
@@ -56,37 +58,26 @@ function consumeSymbolOrOperator(data, start) {
 	let sequence;
 
 	switch (data.charCodeAt(start)) {
-		case QUOTE: return consumeString(data, start, QUOTE);
-		case SINGLE_QUOTE: return consumeString(data, start, SINGLE_QUOTE);
+		case QUOTE:
+		case SINGLE_QUOTE:
+		case BACK_TICK:
+			sequence = matchAll(data, [/"(?:(?:\\")|[^"\r\n])*"?/y, /'(?:(?:\\')|[^'\r\n])*'?/y, /`(?:(?:\\`)|[^`\r\n])*`?/y], start);
+			if (sequence) return new Token(STRING, sequence); break;
 		case SLASH:
-			sequence = match(data, /\/\//y, start);
-			if (sequence) return consumeComment(data, start);
-			break;
+			sequence = match(data, /\/\/[^\n]*/y, start);
+			if (sequence) return new Token(COMMENT, sequence); break;
 		case DOT:
 			sequence = match(data, NUM_PATTERN, start);
-			if (sequence) return new Token(NUMBER, sequence);
-			break;
+			if (sequence) return new Token(NUMBER, sequence); break;
+		case AT:
+			sequence = match(data, /@[A-Z]\w*/y, start)
+			if (sequence) return new Token(META, sequence); break;
 	}
 
 	sequence = matchAll(data, [/[+\-*/\^%<>]=?/y, /&[&=]?/y, /\|[\|=]?/y, /=>/y, /[!=]=?=?/y, /[\?\.]\.?/y, /::?/y], start);
 	if (sequence) return new Token(OPERATOR, sequence);
 
 	return new Token(OPERATOR, data.substring(start, start + 1));
-}
-
-function consumeString(data, start, delimiter) {
-	for (var pos = start + 1; pos < data.length; ++pos) {
-		let c = data.charCodeAt(pos);
-		if (c === delimiter) { return new Token(STRING, data.substring(start, pos + 1)); }
-		if (c === LF || c === CR) { return new Token(INVALID, data.substring(start, pos)); }
-	}
-
-	return new Token(STRING, data.substring(start, pos));
-}
-
-function consumeComment(data, start) {
-	for (var pos = start + 2; pos < data.length && data.charCodeAt(pos) !== LF; ++pos);
-	return new Token(COMMENT, data.substring(start, pos));
 }
 
 function consumeInvalid(data, start) {
@@ -111,13 +102,6 @@ function match(data, pattern, start) {
 function consume(data, start, doesApply) {
 	for (var pos = start + 1; pos < data.length && doesApply(data.charCodeAt(pos)); ++pos);
 	return data.substring(start, pos);
-}
-
-function isWordChar(c) {
-	return c >= LOWER_A && c <= LOWER_Z
-		|| c >= UPPER_A && c <= UPPER_Z
-		|| c >= DIGIT_0 && c <= DIGIT_9
-		|| c === UNDERSCORE;
 }
 
 function isSymbol(c) {
