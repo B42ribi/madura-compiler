@@ -1,18 +1,20 @@
-const NOT = 33;
+const EXCLAMATION_MARK = 33;
 const QUOTE = 34;
-const CHAR = 39;
+const SINGLE_QUOTE = 39;
 const DOT = 46;
-const PAIR = 58;
-const ARA = 91;
-const BLANC = 95;
-const BLOCK = 123;
+const SLASH = 47;
+const COLON = 58;
+const AT = 64;
+const SQUARE_BRACKET_OPEN = 91;
+const UNDERSCORE = 95;
+const BACK_TICK = 96;
+const CURLY_BRACKET_OPEN = 123;
+const TILDE = 126;
 const DEL = 127;
-const NBSP = 160;
 
 const PLUS = 43;
 const MINUS = 45;
 const TIMES = 42;
-const DIV = 47;
 
 const UPPER_A = 65;
 const UPPER_B = 66;
@@ -27,10 +29,12 @@ const DIGIT_0 = 48;
 const DIGIT_1 = 49;
 const DIGIT_9 = 57;
 
+const NUL = 0;
 const SPACE = 32;
 const TAB = 9;
 const LF = 10;
 const CR = 13;
+const NBSP = 160;
 
 const LOWER_A = 97;
 const LOWER_B = 98;

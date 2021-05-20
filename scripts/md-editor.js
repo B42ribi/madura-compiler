@@ -91,12 +91,10 @@
 				markUp: (line, text) => markUp(scanner, line, text)
 			};
 
-			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), '// implicit public and shared'));
-			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), 'Void main() => greet()'));
+			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), 'fun main() => greet(100)'));
 			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), '\xA0'));
-			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), 'public shared Void greet() {'));
-			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), '\xA0 \xA0 I32 count = 100'));
-			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), '\xA0 \xA0 var message = "Hey x ${count}"'));
+			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), 'fun greet(count: I32) {'));
+			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), '\xA0 \xA0 let message: String = "Hey x ${count}"'));
 			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), '\xA0 \xA0 println(message)'));
 			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), '}'));
 		}
@@ -202,18 +200,14 @@
 			line.appendChild(token);
 
 			switch (t.type) {
-				case TokenType.KEYWORD: token.classList.add('md-keyword'); break;
-				case TokenType.TYPE: token.classList.add('md-type'); break;
-				case TokenType.NUMBER: token.classList.add('md-number'); break;
-				case TokenType.STRING: token.classList.add('md-string'); break;
-				case TokenType.OPERATOR:
-				case TokenType.ASSIGNMENT:
-				case TokenType.COMPARISON: token.classList.add('md-symbol'); break;
-				case TokenType.COMMENT:
-				case TokenType.SUBOPERATOR: token.classList.add('md-comment'); break;
-				case TokenType.CONSTANT:
-				case TokenType.META: token.classList.add('md-meta'); break;
-				case TokenType.INVALID: token.classList.add('md-error'); break;
+				case KEYWORD: token.classList.add('md-keyword'); break;
+				case TYPE: token.classList.add('md-type'); break;
+				case NUMBER: token.classList.add('md-number'); break;
+				case STRING: token.classList.add('md-string'); break;
+				case OPERATOR: token.classList.add('md-symbol'); break;
+				case COMMENT: token.classList.add('md-comment'); break;
+				case META: token.classList.add('md-meta'); break;
+				case INVALID: token.classList.add('md-error'); break;
 			}
 		}
 
