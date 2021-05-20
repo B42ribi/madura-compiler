@@ -20,7 +20,7 @@ class MdScanner {
 				(c >= DIGIT_0 && c <= DIGIT_9) ? consumeNumber(data, pos) :
 				(c >= NUL && c <= SPACE || c === NBSP || c === DEL) ? consumeNonPrintable(data, pos) :
 				(isSymbol(c)) ? consumeSymbolOrOperator(data, pos) :
-					token = consumeInvalid(data, pos);
+					consumeInvalid(data, pos);
 
 			pos += token.data.length;
 			tokens.push(token);
@@ -70,7 +70,7 @@ function consumeSymbolOrOperator(data, start) {
 			sequence = match(data, NUM_PATTERN, start);
 			if (sequence) return new Token(NUMBER, sequence); break;
 		case AT:
-			sequence = match(data, /@[A-Z]\w*/y, start)
+			sequence = match(data, /@(?:[A-Z]\w*)?/y, start)
 			if (sequence) return new Token(META, sequence); break;
 	}
 
