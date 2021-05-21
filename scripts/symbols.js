@@ -4,6 +4,7 @@ const SINGLE_QUOTE = 39;
 const DOT = 46;
 const SLASH = 47;
 const COLON = 58;
+const EQ = 61;
 const AT = 64;
 const SQUARE_BRACKET_OPEN = 91;
 const UNDERSCORE = 95;
