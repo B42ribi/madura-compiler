@@ -1,7 +1,5 @@
 (function () {
 
-	let hidden = new WeakMap();
-
 	const ENTER = 'Enter';
 	const TAB_KEY = 'Tab';
 	const BACKSPACE = 'Backspace';
@@ -22,32 +20,52 @@
 		constructor() {
 			super();
 
+			let style = document.createElement('LINK');
+			style.rel = 'stylesheet';
+			style.href = "styles/md-editor.css";
+
 			let panel = document.createElement('div');
 			panel.classList.add('md-editor');
 			panel.contentEditable = true;
 
-			panel.addEventListener('keydown', (event) => {
-				let position;
-				switch (event.key) {
-					case ENTER:
-						event.preventDefault();
-						hidden[this].lineBreak();
-						break;
-					case TAB_KEY:
-						event.preventDefault();
-						position = hidden[this].getPosition();
-						document.execCommand('insertText', false, tabs(4 - (position.index % 4)));
-						break;
-					case BACKSPACE:
-						position = hidden[this].getPosition();
-						if (position.index === 0) {
-							event.preventDefault();
-							hidden[this].glueLines(position.line);
-						}
-						break;
-				}
-			});
+			let shadowRoot = this.attachShadow({ mode: 'closed' });
+			shadowRoot.appendChild(style);
+			shadowRoot.appendChild(panel);
 
+			let isFirefox = navigator.userAgent.indexOf("Firefox") != -1;
+			let root = isFirefox ? window : shadowRoot
+
+			let scanner = document.getElementsByTagName('md-scanner')[0];
+
+			initKeyDown(root, panel, scanner);
+			this.initKeyUp(root, panel, scanner);
+
+			this.setValue = (text) => {
+				panel.innerHTML = '';
+				if (text) {
+					let tabCounter = 0;
+					for (let segment of text.split('\n')) {
+						let trimmed = segment.trim();
+						if (trimmed.startsWith('}') && tabCounter > 0) --tabCounter;
+						if (tabCounter > 0) trimmed = tabs(4 * tabCounter) + trimmed;
+						if (trimmed.endsWith('{')) ++tabCounter;
+						let line = markUp(scanner, document.createElement('LINE'), (trimmed !== '') ? trimmed : '\xA0');
+						panel.appendChild(line);
+					}
+				}
+			}
+		}
+
+		static get observedAttributes() { return ['value']; }
+
+		attributeChangedCallback(attribute, oldValue, newValue) {
+			if (attribute === 'value' && newValue) {
+				this.setValue(newValue);
+				this.removeAttribute('value');
+			}
+		}
+
+		initKeyUp(root, panel, scanner) {
 			panel.addEventListener('keyup', (event) => {
 				switch (event.key) {
 					case SHIFT:
@@ -62,41 +80,13 @@
 					case END: return;
 				}
 
-				if (hidden[this].timer) { window.clearTimeout(hidden[this].timer); }
-				hidden[this].timer = window.setTimeout(() => {
-					let position = hidden[this].getPosition();
-					hidden[this].markUp(position.line);
-					hidden[this].setPosition(position.line, position.index);
+				if (this.timer) { window.clearTimeout(this.timer); }
+				this.timer = window.setTimeout(() => {
+					let position = getPosition(root);
+					if (scanner) markUp(scanner, position.line);
+					setPosition(root, position.line, position.index);
 				}, 10);
 			});
-
-			let style = document.createElement('LINK');
-			style.rel = 'stylesheet';
-			style.href = "styles/md-editor.css";
-
-			let shadowRoot = this.attachShadow({ mode: 'closed' });
-			shadowRoot.appendChild(style);
-			shadowRoot.appendChild(panel);
-
-			let isFirefox = navigator.userAgent.indexOf("Firefox") != -1;
-			let root = isFirefox ? window : shadowRoot
-
-			let scanner = new MdScanner();
-
-			hidden[this] = {
-				getPosition: () => getPosition(root),
-				setPosition: (line, index) => setPosition(root, line, index),
-				lineBreak: () => lineBreak(root, panel, scanner),
-				glueLines: (line) => glueLines(root, panel, scanner, line),
-				markUp: (line, text) => markUp(scanner, line, text)
-			};
-
-			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), 'fun main() => greet(100)'));
-			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), '\xA0'));
-			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), 'fun greet(count: I32) {'));
-			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), '\xA0 \xA0 let message: String = "Hey x ${count}"'));
-			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), '\xA0 \xA0 println(message)'));
-			panel.appendChild(hidden[this].markUp(document.createElement('LINE'), '}'));
 		}
 	}
 
@@ -104,7 +94,7 @@
 
 	function tabs(count) {
 		let data = [];
-		for (let i = 0; i < count; ++i) { data.push(' '); }
+		for (let i = 0; i < count; ++i) { data.push('\xA0'); }
 		return data.join('');
 	}
 
@@ -190,6 +180,11 @@
 		}
 	}
 
+	function startsWithUppercase(text) {
+		let c = text.charCodeAt(0);
+		return (c >= UPPER_A && c <= UPPER_Z);
+	}
+
 	function markUp(scanner, line, text) {
 		let tokens = scanner.parse(text ? text : line.innerText);
 		line.innerHTML = '';
@@ -201,7 +196,7 @@
 
 			switch (t.type) {
 				case KEYWORD: item.classList.add('md-keyword'); break;
-				case NAME: if (t.upper) item.classList.add('md-type'); break;
+				case NAME: if (startsWithUppercase(t.data)) item.classList.add('md-type'); break;
 				case NUMBER: item.classList.add('md-number'); break;
 				case STRING: item.classList.add('md-string'); break;
 				case SYMBOL: item.classList.add('md-symbol'); break;
@@ -212,6 +207,30 @@
 		}
 
 		return line;
+	}
+
+	function initKeyDown(root, panel, scanner) {
+		panel.addEventListener('keydown', (event) => {
+			let position;
+			switch (event.key) {
+				case ENTER:
+					event.preventDefault();
+					lineBreak(root, panel, scanner);
+					break;
+				case TAB_KEY:
+					event.preventDefault();
+					position = getPosition(root);
+					document.execCommand('insertText', false, tabs(4 - (position.index % 4)));
+					break;
+				case BACKSPACE:
+					position = getPosition(root);
+					if (position.index === 0) {
+						event.preventDefault();
+						glueLines(root, panel, scanner, position.line);
+					}
+					break;
+			}
+		});
 	}
 
 })();
