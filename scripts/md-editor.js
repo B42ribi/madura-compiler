@@ -35,10 +35,8 @@
 			let isFirefox = navigator.userAgent.indexOf("Firefox") != -1;
 			let root = isFirefox ? window : shadowRoot
 
-			let scanner = document.getElementsByTagName('md-scanner')[0];
-
-			initKeyDown(root, panel, scanner);
-			this.initKeyUp(root, panel, scanner);
+			initKeyDown(root, panel);
+			this.initKeyUp(root, panel);
 
 			this.setValue = (text) => {
 				panel.innerHTML = '';
@@ -49,23 +47,14 @@
 						if (trimmed.startsWith('}') && tabCounter > 0) --tabCounter;
 						if (tabCounter > 0) trimmed = tabs(4 * tabCounter) + trimmed;
 						if (trimmed.endsWith('{')) ++tabCounter;
-						let line = markUp(scanner, document.createElement('LINE'), (trimmed !== '') ? trimmed : '\xA0');
+						let line = markUp(document.createElement('LINE'), (trimmed !== '') ? trimmed : '\xA0');
 						panel.appendChild(line);
 					}
 				}
 			}
 		}
 
-		static get observedAttributes() { return ['value']; }
-
-		attributeChangedCallback(attribute, oldValue, newValue) {
-			if (attribute === 'value' && newValue) {
-				this.setValue(newValue);
-				this.removeAttribute('value');
-			}
-		}
-
-		initKeyUp(root, panel, scanner) {
+		initKeyUp(root, panel) {
 			panel.addEventListener('keyup', (event) => {
 				switch (event.key) {
 					case SHIFT:
@@ -83,7 +72,7 @@
 				if (this.timer) { window.clearTimeout(this.timer); }
 				this.timer = window.setTimeout(() => {
 					let position = getPosition(root);
-					if (scanner) markUp(scanner, position.line);
+					markUp(position.line);
 					setPosition(root, position.line, position.index);
 				}, 10);
 			});
@@ -138,7 +127,7 @@
 		sel.addRange(range);
 	}
 
-	function lineBreak(root, panel, scanner) {
+	function lineBreak(root, panel) {
 		let position = getPosition(root);
 		if (!position) { throw 'no line selected to apply linebreak to'; }
 
@@ -156,8 +145,8 @@
 				break;
 			default:
 				let text = selected.innerText;
-				markUp(scanner, selected, text.substring(0, breakPoint));
-				markUp(scanner, line, text.substring(breakPoint, text.length));
+				markUp(selected, text.substring(0, breakPoint));
+				markUp(line, text.substring(breakPoint, text.length));
 		}
 
 		let nextLine = selected.nextSibling;
@@ -170,11 +159,11 @@
 		setPosition(root, line, 0);
 	}
 
-	function glueLines(root, panel, scanner, line) {
+	function glueLines(root, panel, line) {
 		let previousLine = line.previousSibling;
 		if (previousLine) {
 			let previousText = previousLine.innerText;
-			markUp(scanner, previousLine, `${previousText}${line.innerText}`);
+			markUp(previousLine, `${previousText}${line.innerText}`);
 			panel.removeChild(line);
 			setPosition(root, previousLine, previousText.length);
 		}
@@ -185,8 +174,8 @@
 		return (c >= UPPER_A && c <= UPPER_Z);
 	}
 
-	function markUp(scanner, line, text) {
-		let tokens = scanner.parse(text ? text : line.innerText);
+	function markUp(line, text) {
+		let tokens = Scanner.parse(text ? text : line.innerText);
 		line.innerHTML = '';
 
 		for (let t of tokens) {
@@ -209,13 +198,13 @@
 		return line;
 	}
 
-	function initKeyDown(root, panel, scanner) {
+	function initKeyDown(root, panel) {
 		panel.addEventListener('keydown', (event) => {
 			let position;
 			switch (event.key) {
 				case ENTER:
 					event.preventDefault();
-					lineBreak(root, panel, scanner);
+					lineBreak(root, panel);
 					break;
 				case TAB_KEY:
 					event.preventDefault();
@@ -226,7 +215,7 @@
 					position = getPosition(root);
 					if (position.index === 0) {
 						event.preventDefault();
-						glueLines(root, panel, scanner, position.line);
+						glueLines(root, panel, position.line);
 					}
 					break;
 			}

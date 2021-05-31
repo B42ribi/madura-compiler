@@ -1,4 +1,4 @@
-(function () {
+let Scanner = (function () {
 
 	const NUM_PATTERN = /(?:[0-9]+(?:_+[0-9]+)*)?\.[0-9]+(?:_+[0-9]+)*[fi]?/y;
 	const INT_PATTERN = /[0-9]+(?:_+[0-9]+)*[Li]?/y;
@@ -8,33 +8,27 @@
 	const ALLOWED_KEYWORDS = new Set(['as', 'catch', 'class', 'else', 'enum', 'false', 'for', 'fun', 'if', 'import', 'in', 'inline', 'is', 'jump', 'let',
 		'match', 'mut', 'null', 'private', 'protected', 'public', 'return', 'shared', 'super', 'this', 'throw', 'true', 'try', 'typealias', 'while']);
 
-	class MdScanner extends HTMLElement {
+	function parse(data) {
+		let tokens = [];
+		let pos = 0;
 
-		parse(data) {
-			let tokens = [];
-			let pos = 0;
+		while (pos < data.length) {
+			let c = data.charCodeAt(pos);
+			let token =
+				(c >= LOWER_A && c <= LOWER_Z) ? consumeNameOrKeyword(data, pos) :
+				(c >= UPPER_A && c <= UPPER_Z) ? consumeNameOrType(data, pos) :
+				(c >= DIGIT_0 && c <= DIGIT_9) ? consumeNumber(data, pos) :
+				(c >= NUL && c <= SPACE || c === NBSP || c === DEL) ? consumeNonPrintable(data, pos) :
+				(isSymbol(c)) ? consumeSymbolOrOperator(data, pos) :
+					consumeInvalid(data, pos);
 
-			while (pos < data.length) {
-				let c = data.charCodeAt(pos);
-				let token =
-					(c >= LOWER_A && c <= LOWER_Z) ? consumeNameOrKeyword(data, pos) :
-					(c >= UPPER_A && c <= UPPER_Z) ? consumeNameOrType(data, pos) :
-					(c >= DIGIT_0 && c <= DIGIT_9) ? consumeNumber(data, pos) :
-					(c >= NUL && c <= SPACE || c === NBSP || c === DEL) ? consumeNonPrintable(data, pos) :
-					(isSymbol(c)) ? consumeSymbolOrOperator(data, pos) :
-						consumeInvalid(data, pos);
-
-				token.pos = pos;
-				pos += token.data.length;
-				tokens.push(token);
-			}
-
-			return tokens;
+			token.pos = pos;
+			pos += token.data.length;
+			tokens.push(token);
 		}
 
+		return tokens;
 	}
-
-	customElements.define('md-scanner', MdScanner);
 
 	function consumeNameOrKeyword(data, start) {
 		let sequence = match(data, /b'\\?[ -~]'/y, start);
@@ -118,6 +112,8 @@
 	function isWhiteSpace(c) {
 		return c === SPACE || c === NBSP || c === TAB;
 	}
+
+	return { parse: (data) => parse(data) };
 
 })();
 

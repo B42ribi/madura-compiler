@@ -8,12 +8,15 @@
 	<script src="scripts/symbols.js"></script>
 	<script src="scripts/md-scanner.js"></script>
 	<script src="scripts/md-editor.js"></script>
-	<style>body { background-color: #272d2f; } </style>
+	<style>body { background-color: #272d2f; }</style>
 </head>
 
 <body>
-	<md-scanner></md-scanner>
-	<md-editor value ="fun main() => greet(100)&#x0A;&#x0A;fun greet(count: I32) {&#x0A;let message: String = &quot;Hey x ${count}&quot;&#x0A;println(message)&#x0A;}"></md-editor>
+	<md-editor></md-editor>
+	<script>
+		let code = 'fun main() => greet(100)\n\nfun greet(count: I32) {\nlet message: String = "Hey x ${count}"\nprintln(message)\n}';
+		document.getElementsByTagName('md-editor')[0].setValue(code);
+	</script>
 </body>
 
 </html>
