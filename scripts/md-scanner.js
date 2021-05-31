@@ -16,12 +16,13 @@ class MdScanner {
 			let c = data.charCodeAt(pos);
 			let token =
 				(c >= LOWER_A && c <= LOWER_Z) ? consumeNameOrKeyword(data, pos) :
-				(c >= UPPER_A && c <= UPPER_Z) ? consumeType(data, pos) :
+				(c >= UPPER_A && c <= UPPER_Z) ? consumeNameOrType(data, pos) :
 				(c >= DIGIT_0 && c <= DIGIT_9) ? consumeNumber(data, pos) :
 				(c >= NUL && c <= SPACE || c === NBSP || c === DEL) ? consumeNonPrintable(data, pos) :
 				(isSymbol(c)) ? consumeSymbolOrOperator(data, pos) :
 					consumeInvalid(data, pos);
 
+			token.pos = pos;
 			pos += token.data.length;
 			tokens.push(token);
 		}
@@ -39,8 +40,10 @@ function consumeNameOrKeyword(data, start) {
 	return new Token(type, sequence);
 }
 
-function consumeType(data, start) {
-	return new Token(TYPE, match(data, /[A-Z]\w*/y, start));
+function consumeNameOrType(data, start) {
+	let token = new Token(NAME, match(data, /[A-Z]\w*/y, start));
+	token.upper = true;
+	return token;
 }
 
 function consumeNumber(data, start) {
@@ -75,9 +78,9 @@ function consumeSymbolOrOperator(data, start) {
 	}
 
 	sequence = matchAll(data, [/[+\-*/\^%<>]=?/y, /&[&=]?/y, /\|[\|=]?/y, /=>/y, /[!=]=?=?/y, /[\?\.]\.?/y, /::?/y], start);
-	if (sequence) return new Token(OPERATOR, sequence);
+	if (sequence) return new Token(SYMBOL, sequence);
 
-	return new Token(OPERATOR, data.substring(start, start + 1));
+	return new Token(SYMBOL, data.substring(start, start + 1));
 }
 
 function consumeInvalid(data, start) {
@@ -118,13 +121,12 @@ const WHITESPACE = 0;
 const LINEBREAK = 1;
 const NAME = 2;
 const KEYWORD = 3;
-const TYPE = 4;
-const NUMBER = 5;
-const STRING = 6;
-const OPERATOR = 7;
-const COMMENT = 8;
-const META = 9;
-const INVALID = 10;
+const NUMBER = 4;
+const STRING = 5;
+const SYMBOL = 6;
+const COMMENT = 7;
+const META = 8;
+const INVALID = 9;
 
 class Token {
 

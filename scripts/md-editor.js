@@ -195,19 +195,19 @@
 		line.innerHTML = '';
 
 		for (let t of tokens) {
-			let token = document.createElement('span');
-			token.appendChild(document.createTextNode(t.data));
-			line.appendChild(token);
+			let item = document.createElement('span');
+			item.appendChild(document.createTextNode(t.data));
+			line.appendChild(item);
 
 			switch (t.type) {
-				case KEYWORD: token.classList.add('md-keyword'); break;
-				case TYPE: token.classList.add('md-type'); break;
-				case NUMBER: token.classList.add('md-number'); break;
-				case STRING: token.classList.add('md-string'); break;
-				case OPERATOR: token.classList.add('md-symbol'); break;
-				case COMMENT: token.classList.add('md-comment'); break;
-				case META: token.classList.add('md-meta'); break;
-				case INVALID: token.classList.add('md-error'); break;
+				case KEYWORD: item.classList.add('md-keyword'); break;
+				case NAME: if (t.upper) item.classList.add('md-type'); break;
+				case NUMBER: item.classList.add('md-number'); break;
+				case STRING: item.classList.add('md-string'); break;
+				case SYMBOL: item.classList.add('md-symbol'); break;
+				case COMMENT: item.classList.add('md-comment'); break;
+				case META: item.classList.add('md-meta'); break;
+				case INVALID: item.classList.add('md-error'); break;
 			}
 		}
 
