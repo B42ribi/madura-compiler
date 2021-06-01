@@ -43,13 +43,24 @@
 				let lines = MarkUp.markUpCode(text);
 				lines.forEach(l => panel.appendChild(l));
 			}
+
+			this.getValue = () => {
+				let lines = [];
+				for (let c of panel.children)
+					lines.push(c.innerText.trim())
+				return lines.join('\n');
+			}
+
+			this.refresh = () => this.setValue(this.getValue());
+
+			this.setValue('');
 		}
 
 		attributeChangedCallback(key, old, value) {
 			if (key === 'src' && value) {
 				fetch(value)
-					.then(response => response.text())
-					.then(data => this.setValue(data));
+					.then(response => this.setValue(response.text()))
+					.catch(error => console.log(error));
 			}
 		}
 

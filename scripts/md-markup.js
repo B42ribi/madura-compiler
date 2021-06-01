@@ -30,21 +30,25 @@ let MarkUp = (function () {
 	}
 
 	function markUpCode(text) {
-		let lines = [];
-
 		if (text) {
+			let lines = [];
 			let tabCounter = 0;
 			for (let t of text.split('\n')) {
 				let segment = t.trim();
 				if (segment.startsWith('}') && tabCounter > 0) --tabCounter;
 				if (tabCounter > 0) segment = tabs(4 * tabCounter) + segment;
 				if (segment.endsWith('{')) ++tabCounter;
-				let line = markUpLine(document.createElement('LINE'), (segment !== '') ? segment : '\xA0');
-				lines.push(line);
+				lines.push(createLine(segment));
 			}
-		}
 
-		return lines;
+			return lines;
+		} else {
+			return [createLine()];
+		}
+	}
+
+	function createLine(segment) {
+		return markUpLine(document.createElement('line'), segment ? segment : '\xA0');
 	}
 
 	function tabs(count) {
