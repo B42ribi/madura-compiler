@@ -5,18 +5,14 @@
 	<meta charset="utf-8">
 	<title>Madura Programming Language</title>
 	<link rel="icon" type="image/png" href="favicon.ico">
-	<script src="scripts/symbols.js"></script>
 	<script src="scripts/md-scanner.js"></script>
+	<script src="scripts/md-markup.js"></script>
 	<script src="scripts/md-editor.js"></script>
 	<style>body { background-color: #272d2f; }</style>
 </head>
 
 <body>
-	<md-editor></md-editor>
-	<script>
-		let code = 'fun main() => greet(100)\n\nfun greet(count: I32) {\nlet message: String = "Hey x ${count}"\nprintln(message)\n}';
-		document.getElementsByTagName('md-editor')[0].setValue(code);
-	</script>
+	<md-editor src="source/example.mdr"></md-editor>
 </body>
 
 </html>

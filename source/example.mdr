@@ -1,0 +1,6 @@
+fun main() => greet(100)
+
+fun greet(count: I32) {
+	let message: String = "Hey x ${count}"
+	println(message)
+}

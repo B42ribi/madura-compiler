@@ -36,47 +36,24 @@
 			let root = isFirefox ? window : shadowRoot
 
 			initKeyDown(root, panel);
-			this.initKeyUp(root, panel);
+			initKeyUp(root, panel);
 
 			this.setValue = (text) => {
 				panel.innerHTML = '';
-				if (text) {
-					let tabCounter = 0;
-					for (let segment of text.split('\n')) {
-						let trimmed = segment.trim();
-						if (trimmed.startsWith('}') && tabCounter > 0) --tabCounter;
-						if (tabCounter > 0) trimmed = tabs(4 * tabCounter) + trimmed;
-						if (trimmed.endsWith('{')) ++tabCounter;
-						let line = markUp(document.createElement('LINE'), (trimmed !== '') ? trimmed : '\xA0');
-						panel.appendChild(line);
-					}
-				}
+				let lines = MarkUp.markUpCode(text);
+				lines.forEach(l => panel.appendChild(l));
 			}
 		}
 
-		initKeyUp(root, panel) {
-			panel.addEventListener('keyup', (event) => {
-				switch (event.key) {
-					case SHIFT:
-					case CONTROL:
-					case ALT:
-					case ENTER:
-					case LEFT:
-					case RIGHT:
-					case UP:
-					case DOWN:
-					case START:
-					case END: return;
-				}
-
-				if (this.timer) { window.clearTimeout(this.timer); }
-				this.timer = window.setTimeout(() => {
-					let position = getPosition(root);
-					markUp(position.line);
-					setPosition(root, position.line, position.index);
-				}, 10);
-			});
+		attributeChangedCallback(key, old, value) {
+			if (key === 'src' && value) {
+				fetch(value)
+					.then(response => response.text())
+					.then(data => this.setValue(data));
+			}
 		}
+
+		static get observedAttributes() { return ['src']; }
 	}
 
 	customElements.define('md-editor', MdEditor);
@@ -145,8 +122,8 @@
 				break;
 			default:
 				let text = selected.innerText;
-				markUp(selected, text.substring(0, breakPoint));
-				markUp(line, text.substring(breakPoint, text.length));
+				MarkUp.markUpLine(selected, text.substring(0, breakPoint));
+				MarkUp.markUpLine(line, text.substring(breakPoint, text.length));
 		}
 
 		let nextLine = selected.nextSibling;
@@ -163,39 +140,10 @@
 		let previousLine = line.previousSibling;
 		if (previousLine) {
 			let previousText = previousLine.innerText;
-			markUp(previousLine, `${previousText}${line.innerText}`);
+			MarkUp.markUpLine(previousLine, `${previousText}${line.innerText}`);
 			panel.removeChild(line);
 			setPosition(root, previousLine, previousText.length);
 		}
-	}
-
-	function startsWithUppercase(text) {
-		let c = text.charCodeAt(0);
-		return (c >= UPPER_A && c <= UPPER_Z);
-	}
-
-	function markUp(line, text) {
-		let tokens = Scanner.parse(text ? text : line.innerText);
-		line.innerHTML = '';
-
-		for (let t of tokens) {
-			let item = document.createElement('span');
-			item.appendChild(document.createTextNode(t.data));
-			line.appendChild(item);
-
-			switch (t.type) {
-				case KEYWORD: item.classList.add('md-keyword'); break;
-				case NAME: if (startsWithUppercase(t.data)) item.classList.add('md-type'); break;
-				case NUMBER: item.classList.add('md-number'); break;
-				case STRING: item.classList.add('md-string'); break;
-				case SYMBOL: item.classList.add('md-symbol'); break;
-				case COMMENT: item.classList.add('md-comment'); break;
-				case META: item.classList.add('md-meta'); break;
-				case INVALID: item.classList.add('md-error'); break;
-			}
-		}
-
-		return line;
 	}
 
 	function initKeyDown(root, panel) {
@@ -219,6 +167,32 @@
 					}
 					break;
 			}
+		});
+	}
+
+	function initKeyUp(root, panel) {
+		let clock = {};
+
+		panel.addEventListener('keyup', (event) => {
+			switch (event.key) {
+				case SHIFT:
+				case CONTROL:
+				case ALT:
+				case ENTER:
+				case LEFT:
+				case RIGHT:
+				case UP:
+				case DOWN:
+				case START:
+				case END: return;
+			}
+
+			if (clock.timer) { window.clearTimeout(clock.timer); }
+			clock.timer = window.setTimeout(() => {
+				let position = getPosition(root);
+				MarkUp.markUpLine(position.line);
+				setPosition(root, position.line, position.index);
+			}, 10);
 		});
 	}
 
