@@ -59,7 +59,8 @@
 		attributeChangedCallback(key, old, value) {
 			if (key === 'src' && value) {
 				fetch(value)
-					.then(response => this.setValue(response.text()))
+					.then(response => response.text())
+					.then(data => this.setValue(data))
 					.catch(error => console.log(error));
 			}
 		}
