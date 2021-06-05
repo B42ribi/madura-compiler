@@ -36,7 +36,7 @@ let MarkUp = (function () {
 			for (let t of text.split('\n')) {
 				let segment = t.trim();
 				if (segment.startsWith('}') && tabCounter > 0) --tabCounter;
-				if (tabCounter > 0) segment = tabs(4 * tabCounter) + segment;
+				if (tabCounter > 0) segment = spaces(4 * tabCounter) + segment;
 				if (segment.endsWith('{')) ++tabCounter;
 				lines.push(createLine(segment));
 			}
@@ -51,7 +51,7 @@ let MarkUp = (function () {
 		return markUpLine(document.createElement('line'), segment ? segment : '\xA0');
 	}
 
-	function tabs(count) {
+	function spaces(count) {
 		let data = [];
 		for (let i = 0; i < count; ++i) { data.push('\xA0'); }
 		return data.join('');

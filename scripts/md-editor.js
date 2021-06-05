@@ -1,6 +1,7 @@
 (function () {
 
 	const ENTER = 'Enter';
+	const SPACE = ' ';
 	const TAB_KEY = 'Tab';
 	const BACKSPACE = 'Backspace';
 
@@ -70,7 +71,7 @@
 
 	customElements.define('md-editor', MdEditor);
 
-	function tabs(count) {
+	function spaces(count) {
 		let data = [];
 		for (let i = 0; i < count; ++i) { data.push('\xA0'); }
 		return data.join('');
@@ -81,7 +82,7 @@
 		let sel = root.getSelection();
 		let anchor = sel.anchorNode;
 		while (anchor && anchor.tagName != 'SPAN') { anchor = anchor.parentNode; }
-		if (!anchor) { return null; }
+		if (!anchor) return null;
 		let line = anchor.parentNode;
 
 		// determine selected index
@@ -169,7 +170,7 @@
 				case TAB_KEY:
 					event.preventDefault();
 					position = getPosition(root);
-					document.execCommand('insertText', false, tabs(4 - (position.index % 4)));
+					document.execCommand('insertText', false, spaces(4 - (position.index % 4)));
 					break;
 				case BACKSPACE:
 					position = getPosition(root);
@@ -191,6 +192,8 @@
 				case CONTROL:
 				case ALT:
 				case ENTER:
+				case SPACE:
+				case TAB_KEY:
 				case LEFT:
 				case RIGHT:
 				case UP:
