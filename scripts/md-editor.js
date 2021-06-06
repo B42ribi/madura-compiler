@@ -207,12 +207,12 @@
 					MarkUp.markUpLine(position.line);
 					setPosition(root, position.line, position.index);
 				}
-			}, 10);
+			}, 80);
 		});
 	}
 
 	function isFireFox() {
-		return navigator.userAgent.indexOf("Firefox") != -1;;
+		return navigator.userAgent.indexOf("Firefox") != -1;
 	}
 
 })();
