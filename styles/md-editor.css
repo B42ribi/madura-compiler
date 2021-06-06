@@ -1,13 +1,12 @@
-body {
-	background-color: #272d2f;
-}
-
 .md-editor {
 	background-color: #1c2021;
 	color: #e0e2e4;
 	padding: 10px 10px 10px 0;
 	font-family: "Consolas", monospace;
 	font-size: 14pt;
+	overflow: auto;
+	white-space: nowrap;
+	height: calc(100% - 20px);
 }
 
 .md-keyword { color: #93c763; }
