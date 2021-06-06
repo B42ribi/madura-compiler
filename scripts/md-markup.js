@@ -1,12 +1,14 @@
 let MarkUp = (function () {
 
+	const NBSP = '\xA0'; 
+
 	function markUpLine(line, text) {
 		let tokens = Scanner.parse(text ? text : line.innerText);
 		line.innerHTML = '';
 
 		for (let t of tokens) {
 			let item = document.createElement('span');
-			item.appendChild(document.createTextNode(t.data));
+			item.appendChild(document.createTextNode((t.type === LINEBREAK) ? NBSP : t.data));
 			line.appendChild(item);
 
 			switch (t.type) {
@@ -48,12 +50,12 @@ let MarkUp = (function () {
 	}
 
 	function createLine(segment) {
-		return markUpLine(document.createElement('line'), segment ? segment : '\xA0');
+		return markUpLine(document.createElement('line'), segment ? segment : NBSP);
 	}
 
 	function spaces(count) {
 		let data = [];
-		for (let i = 0; i < count; ++i) { data.push('\xA0'); }
+		for (let i = 0; i < count; ++i) { data.push(NBSP); }
 		return data.join('');
 	}
 
