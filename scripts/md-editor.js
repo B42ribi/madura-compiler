@@ -32,9 +32,7 @@
 			let shadowRoot = this.attachShadow({ mode: 'closed' });
 			shadowRoot.appendChild(style);
 			shadowRoot.appendChild(panel);
-
-			let isFirefox = navigator.userAgent.indexOf("Firefox") != -1;
-			let root = isFirefox ? window : shadowRoot
+			let root = isFireFox() ? window : shadowRoot
 
 			initKeyDown(root, panel);
 			initKeyUp(root, panel);
@@ -205,10 +203,16 @@
 			if (clock.timer) { window.clearTimeout(clock.timer); }
 			clock.timer = window.setTimeout(() => {
 				let position = getPosition(root);
-				MarkUp.markUpLine(position.line);
-				setPosition(root, position.line, position.index);
+				if (position) {
+					MarkUp.markUpLine(position.line);
+					setPosition(root, position.line, position.index);
+				}
 			}, 10);
 		});
+	}
+
+	function isFireFox() {
+		return navigator.userAgent.indexOf("Firefox") != -1;;
 	}
 
 })();
