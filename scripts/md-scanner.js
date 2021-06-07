@@ -1,7 +1,7 @@
 let Scanner = (function () {
 
-	const NUM_PATTERN = /(?:[0-9]+(?:_+[0-9]+)*)?\.[0-9]+(?:_+[0-9]+)*[fi]?/y;
-	const INT_PATTERN = /[0-9]+(?:_+[0-9]+)*[Li]?/y;
+	const NUM_PATTERN = /(?:[0-9]+(?:_+[0-9]+)*)?\.[0-9]+(?:_+[0-9]+)*i?/y;
+	const INT_PATTERN = /[0-9]+(?:_+[0-9]+)*i?/y;
 	const HEX_PATTERN = /0x[0-9A-Fa-f]+(?:_+[0-9A-Fa-f]+)*/y
 	const BIN_PATTERN = /0b[01]+(?:_+[01]+)*/y
 
