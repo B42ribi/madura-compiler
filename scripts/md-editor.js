@@ -183,14 +183,15 @@
 
 	function initKeyUp(root, panel) {
 		let clock = {};
+		let notFireFox = !isFireFox();
 
 		panel.addEventListener('keyup', (event) => {
 			switch (event.key) {
+				case SPACE: if (notFireFox) break;
 				case SHIFT:
 				case CONTROL:
 				case ALT:
 				case ENTER:
-				case SPACE:
 				case TAB_KEY:
 				case LEFT:
 				case RIGHT:
