@@ -187,12 +187,12 @@
 
 		panel.addEventListener('keyup', (event) => {
 			switch (event.key) {
-				case SPACE: if (notFireFox) break;
+				case SPACE:
+				case TAB_KEY: if (notFireFox) break;
 				case SHIFT:
 				case CONTROL:
 				case ALT:
 				case ENTER:
-				case TAB_KEY:
 				case LEFT:
 				case RIGHT:
 				case UP:
