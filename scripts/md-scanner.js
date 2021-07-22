@@ -106,8 +106,8 @@ let Scanner = (function () {
 	function isSymbol(c) {
 		return c >= EXCLAMATION_MARK && c <= SLASH
 			|| c >= COLON && c <= AT
-			|| c >= SQUARE_BRACKET_OPEN && c <= BACK_TICK
-			|| c >= CURLY_BRACKET_OPEN && c <= TILDE;
+			|| c >= SQUARE_BRACKET && c <= BACK_TICK
+			|| c >= CURLY_BRACKET && c <= TILDE;
 	}
 
 	function isWhiteSpace(c) {
@@ -144,62 +144,22 @@ const SINGLE_QUOTE = 39;
 const DOT = 46;
 const SLASH = 47;
 const COLON = 58;
-const EQ = 61;
 const AT = 64;
-const SQUARE_BRACKET_OPEN = 91;
-const UNDERSCORE = 95;
+const SQUARE_BRACKET = 91;
 const BACK_TICK = 96;
-const CURLY_BRACKET_OPEN = 123;
+const CURLY_BRACKET = 123;
 const TILDE = 126;
 const DEL = 127;
 
-const PLUS = 43;
-const MINUS = 45;
-const TIMES = 42;
-
+const LOWER_A = 97;
+const LOWER_Z = 122;
 const UPPER_A = 65;
-const UPPER_B = 66;
-const UPPER_C = 67;
-const UPPER_D = 68;
-const UPPER_E = 69;
-const UPPER_F = 70;
-const UPPER_L = 76;
 const UPPER_Z = 90;
-
 const DIGIT_0 = 48;
-const DIGIT_1 = 49;
 const DIGIT_9 = 57;
 
 const NUL = 0;
 const SPACE = 32;
 const TAB = 9;
 const LF = 10;
-const CR = 13;
 const NBSP = 160;
-
-const LOWER_A = 97;
-const LOWER_B = 98;
-const LOWER_C = 99;
-const LOWER_D = 100;
-const LOWER_E = 101;
-const LOWER_F = 102;
-const LOWER_G = 103;
-const LOWER_H = 104;
-const LOWER_I = 105;
-const LOWER_J = 106;
-const LOWER_K = 107;
-const LOWER_L = 108;
-const LOWER_M = 109;
-const LOWER_N = 110;
-const LOWER_O = 111;
-const LOWER_P = 112;
-const LOWER_Q = 113;
-const LOWER_R = 114;
-const LOWER_S = 115;
-const LOWER_T = 116;
-const LOWER_U = 117;
-const LOWER_V = 118;
-const LOWER_W = 119;
-const LOWER_X = 120;
-const LOWER_Y = 121;
-const LOWER_Z = 122;
