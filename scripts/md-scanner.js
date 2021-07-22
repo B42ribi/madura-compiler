@@ -105,7 +105,8 @@ let Scanner = (function () {
 
 	function isSymbol(c) {
 		return c >= EXCLAMATION_MARK && c <= SLASH
-			|| c >= COLON && c <= BACK_TICK
+			|| c >= COLON && c <= AT
+			|| c >= SQUARE_BRACKET_OPEN && c <= BACK_TICK
 			|| c >= CURLY_BRACKET_OPEN && c <= TILDE;
 	}
 
