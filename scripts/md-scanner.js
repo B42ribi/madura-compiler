@@ -5,8 +5,8 @@ let Scanner = (function () {
 	const HEX_PATTERN = /0x[0-9A-Fa-f]+(?:_+[0-9A-Fa-f]+)*/y
 	const BIN_PATTERN = /0b[01]+(?:_+[01]+)*/y
 
-	const ALLOWED_KEYWORDS = new Set(['as', 'catch', 'class', 'else', 'enum', 'false', 'for', 'fun', 'if', 'import', 'in', 'inline', 'is', 'jump', 'let',
-		'match', 'mut', 'null', 'private', 'protected', 'public', 'return', 'shared', 'super', 'this', 'throw', 'true', 'try', 'typealias', 'while']);
+	const ALLOWED_KEYWORDS = new Set(['as', 'catch', 'class', 'do', 'else', 'enum', 'false', 'for', 'fun', 'if', 'import', 'in', 'inline', 'is', 'jump', 'let',
+		'match', 'mut', 'null', 'out', 'private', 'protected', 'public', 'return', 'shared', 'super', 'this', 'throw', 'true', 'try', 'typealias', 'while']);
 
 	function parse(data) {
 		let tokens = [];

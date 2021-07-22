@@ -21,13 +21,14 @@
 		constructor() {
 			super();
 
-			let style = document.createElement('LINK');
+			let style = document.createElement('link');
 			style.rel = 'stylesheet';
 			style.href = "styles/md-editor.css";
 
 			let panel = document.createElement('div');
 			panel.classList.add('md-editor');
 			panel.contentEditable = true;
+			this._panel = panel
 
 			let shadowRoot = this.attachShadow({ mode: 'closed' });
 			shadowRoot.appendChild(style);
@@ -37,25 +38,27 @@
 			initKeyDown(root, panel);
 			initKeyUp(root, panel);
 
-			this.setValue = (text) => {
-				panel.innerHTML = '';
-				let lines = MarkUp.markUpCode(text);
-				lines.forEach(l => panel.appendChild(l));
-			}
-
-			this.getValue = () => {
-				let lines = [];
-				for (let c of panel.children)
-					lines.push(c.innerText.trim())
-				return lines.join('\n');
-			}
-
-			this.refresh = () => this.setValue(this.getValue());
-
 			this.setValue('');
 		}
 
-		attributeChangedCallback(key, old, value) {
+		setValue(text) {
+			this._panel.innerHTML = '';
+			let lines = MarkUp.markUpCode(text);
+			lines.forEach(l => this._panel.appendChild(l));
+		}
+
+		getValue() {
+			let lines = [];
+			for (let c of this._panel.children)
+				lines.push(c.innerText.trim())
+			return lines.join('\n');
+		}
+
+		refresh() {
+			this.setValue(this.getValue());
+		}
+
+		attributeChangedCallback(key, _, value) {
 			if (key === 'src' && value) {
 				fetch(value)
 					.then(response => response.text())
@@ -79,12 +82,12 @@
 		// determine selected line
 		let sel = root.getSelection();
 		let anchor = sel.anchorNode;
-		while (anchor && anchor.tagName != 'SPAN') { anchor = anchor.parentNode; }
+		while (anchor && anchor.tagName !== 'SPAN') { anchor = anchor.parentNode; }
 		if (!anchor) return null;
 		let line = anchor.parentNode;
 
 		// determine selected index
-		let tokens = line.getElementsByTagName('SPAN');
+		let tokens = line.getElementsByTagName('span');
 		let index = 0;
 		let t = 0;
 		while (tokens[t] !== anchor) {
@@ -97,7 +100,7 @@
 	}
 
 	function setPosition(root, line, index) {
-		let tokens = line.getElementsByTagName('SPAN');
+		let tokens = line.getElementsByTagName('span');
 		let offset = index;
 		let t = 0;
 		while (offset > tokens[t].innerText.length) {
@@ -120,7 +123,7 @@
 		if (!position) { throw 'no line selected to apply linebreak to'; }
 
 		let selected = position.line;
-		let line = document.createElement('LINE');
+		let line = document.createElement('line');
 		let breakPoint = position.index;
 
 		switch (breakPoint) {
@@ -213,7 +216,7 @@
 	}
 
 	function isFireFox() {
-		return navigator.userAgent.indexOf("Firefox") != -1;
+		return navigator.userAgent.indexOf("Firefox") !== -1;
 	}
 
 })();
