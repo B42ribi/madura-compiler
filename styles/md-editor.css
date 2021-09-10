@@ -1,4 +1,4 @@
-.md-canvas {
+.md-editor {
 	background-color: #1c2021;
 	color: #e0e2e4;
 	padding: 10px 10px 10px 0;
@@ -20,11 +20,6 @@
 
 div { counter-reset: line-counter; }
 line { display: block; }
-
-row {
-	display: block;
-	padding: 0 0 0 20px;
-}
 
 line::before {
 	counter-increment: line-counter;

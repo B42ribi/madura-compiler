@@ -26,7 +26,7 @@
 			style.href = "styles/md-editor.css";
 
 			let panel = document.createElement('div');
-			panel.classList.add('md-canvas');
+			panel.classList.add('md-editor');
 			panel.contentEditable = true;
 			this._panel = panel
 

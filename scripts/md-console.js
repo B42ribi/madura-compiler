@@ -7,10 +7,10 @@
 
 			let style = document.createElement('link');
 			style.rel = 'stylesheet';
-			style.href = "styles/md-editor.css";
+			style.href = "styles/md-console.css";
 
 			let panel = document.createElement('div');
-			panel.classList.add('md-canvas');
+			panel.classList.add('md-console');
 			this._panel = panel
 
 			let shadowRoot = this.attachShadow({ mode: 'closed' });
@@ -25,7 +25,7 @@
 		}
 
 		info(text) {
-			this._panel.appendChild(createLine(`<< ${text} >>`, 'md-keyword'));
+			this._panel.appendChild(createLine(`<< ${text} >>`, 'md-info'));
 		}
 
 		error(text) {
@@ -40,7 +40,7 @@
 		segment.appendChild(document.createTextNode(text));
 		if (style) segment.classList.add(style);
 
-		let line = document.createElement('row');
+		let line = document.createElement('line');
 		line.appendChild(segment);
 		return line;
 	}
