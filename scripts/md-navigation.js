@@ -41,7 +41,9 @@
 		let tokens = Lexer.scan(editor.getValue(), true);
 		
 		try {
-			Parser.parse(tokens);
+			let program = Parser.parse(tokens);
+			let main = program.functions['main'];
+			if (main) main();
 		} catch (e) {
 			console.error(e);
 		}

@@ -58,6 +58,11 @@
 			this.setValue(this.getValue());
 		}
 
+        underline(id) {
+            let segment = this._panel.querySelector(`#t${id}`);
+            if (segment) segment.classList.add('md-underline');
+        }
+
 		attributeChangedCallback(key, _, value) {
 			if (key === 'src' && value) {
 				fetch(value)

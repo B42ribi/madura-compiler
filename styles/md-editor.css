@@ -18,6 +18,12 @@
 .md-string { color: #ce751d; }
 .md-error { color: #bc3f3c; }
 
+.md-underline {
+    text-decoration: underline; 
+    text-decoration-color: #bc3f3c;
+    text-decoration-style: wavy;
+}
+
 div { counter-reset: line-counter; }
 line { display: block; }
 
