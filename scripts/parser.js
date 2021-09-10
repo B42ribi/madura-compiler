@@ -1,7 +1,7 @@
 let Parser = (function () {
 
 	function parse(tokens) {
-		throw 'not jet inplemented';
+		throw 'not yet inplemented';
 	}
 
 	return { parse: (tokens) => parse(tokens) };
