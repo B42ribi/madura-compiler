@@ -1,4 +1,4 @@
-let Scanner = (function () {
+let Lexer = (function () {
 
 	const NUM_PATTERN = /(?:[0-9]+(?:_+[0-9]+)*)?\.[0-9]+(?:_+[0-9]+)*i?/y;
 	const INT_PATTERN = /[0-9]+(?:_+[0-9]+)*i?/y;
@@ -8,7 +8,7 @@ let Scanner = (function () {
 	const ALLOWED_KEYWORDS = new Set(['as', 'catch', 'class', 'do', 'else', 'enum', 'false', 'for', 'fun', 'if', 'import', 'in', 'inline', 'is', 'jump', 'let',
 		'match', 'mut', 'null', 'out', 'private', 'protected', 'public', 'return', 'shared', 'super', 'this', 'throw', 'true', 'try', 'typealias', 'while']);
 
-	function parse(data) {
+	function scan(data) {
 		let tokens = [];
 		let pos = 0;
 
@@ -63,7 +63,7 @@ let Scanner = (function () {
 				sequence = matchAll(data, [/"(?:(?:\\")|[^"\r\n])*"?/y, /'(?:(?:\\')|[^'\r\n])*'?/y, /`(?:(?:\\`)|[^`\r\n])*`?/y], start);
 				if (sequence) return new Token(STRING, sequence); break;
 			case SLASH:
-				sequence = match(data, /\/\/[^\n]*/y, start);
+				sequence = matchAll(data, [/\/\/[^\r\n]*/y], start);
 				if (sequence) return new Token(COMMENT, sequence); break;
 			case DOT:
 				sequence = match(data, NUM_PATTERN, start);
@@ -114,7 +114,7 @@ let Scanner = (function () {
 		return c === SPACE || c === NBSP || c === TAB;
 	}
 
-	return { parse: (data) => parse(data) };
+	return { scan: (data) => scan(data) };
 
 })();
 

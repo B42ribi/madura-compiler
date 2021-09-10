@@ -1,4 +1,4 @@
-(function () {
+(function() {
 
 	const ENTER = 'Enter';
 	const SPACE = ' ';
@@ -26,7 +26,7 @@
 			style.href = "styles/md-editor.css";
 
 			let panel = document.createElement('div');
-			panel.classList.add('md-editor');
+			panel.classList.add('md-canvas');
 			panel.contentEditable = true;
 			this._panel = panel
 
@@ -191,7 +191,8 @@
 		panel.addEventListener('keyup', (event) => {
 			switch (event.key) {
 				case SPACE:
-				case TAB_KEY: if (notFireFox) break;
+				case TAB_KEY:
+					if (notFireFox) break;
 				case SHIFT:
 				case CONTROL:
 				case ALT:
@@ -201,7 +202,8 @@
 				case UP:
 				case DOWN:
 				case START:
-				case END: return;
+				case END:
+					return;
 			}
 
 			if (clock.timer) { window.clearTimeout(clock.timer); }
