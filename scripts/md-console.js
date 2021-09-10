@@ -40,7 +40,7 @@
 		segment.appendChild(document.createTextNode(text));
 		if (style) segment.classList.add(style);
 
-		let line = document.createElement('line');
+		let line = document.createElement('row');
 		line.appendChild(segment);
 		return line;
 	}

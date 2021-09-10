@@ -21,6 +21,11 @@
 div { counter-reset: line-counter; }
 line { display: block; }
 
+row {
+	display: block;
+	padding: 0 0 0 20px;
+}
+
 line::before {
 	counter-increment: line-counter;
 	content: counter(line-counter);
