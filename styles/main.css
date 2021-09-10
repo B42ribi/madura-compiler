@@ -1,9 +1,22 @@
 body {
 	background-color: #272d2f;
 	display: grid;
-	grid-template-columns: 1fr;
-	grid-template-rows: 68px 480px 360px;
-	grid-gap: 10px;
+	grid-template:
+		"editor editor" 480px
+		"navigation console" 360px / 68px 1fr;
+	grid-row-gap: 10px;
 	min-height: calc(100vh - 20px);
 	margin: 10px;
+}
+
+#editor {
+	grid-area: editor;
+}
+
+#navigation {
+	grid-area: navigation;
+}
+
+#console {
+	grid-area: console;
 }

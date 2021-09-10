@@ -8,9 +8,10 @@ let Lexer = (function () {
 	const ALLOWED_KEYWORDS = new Set(['as', 'catch', 'class', 'do', 'else', 'enum', 'false', 'for', 'fun', 'if', 'import', 'in', 'inline', 'is', 'jump', 'let',
 		'match', 'mut', 'null', 'out', 'private', 'protected', 'public', 'return', 'shared', 'super', 'this', 'throw', 'true', 'try', 'typealias', 'while']);
 
-	function scan(data) {
+	function scan(data, ignoreWhitespaces) {
 		let tokens = [];
 		let pos = 0;
+		let id = 0;
 
 		while (pos < data.length) {
 			let c = data.charCodeAt(pos);
@@ -22,9 +23,12 @@ let Lexer = (function () {
 				(isSymbol(c)) ? consumeSymbolOrOperator(data, pos) :
 					consumeInvalid(data, pos);
 
-			token.pos = pos;
+			token.id = id++;
 			pos += token.data.length;
-			tokens.push(token);
+
+			if (!ignoreWhitespaces || token.type !== WHITESPACE) {
+				tokens.push(token);
+			}
 		}
 
 		return tokens;
@@ -114,7 +118,7 @@ let Lexer = (function () {
 		return c === SPACE || c === NBSP || c === TAB;
 	}
 
-	return { scan: (data) => scan(data) };
+	return { scan: (data, ignoreWhitespaces) => scan(data, ignoreWhitespaces) };
 
 })();
 

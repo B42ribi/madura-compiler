@@ -9,21 +9,42 @@
 			style.rel = 'stylesheet';
 			style.href = "styles/md-navigation.css";
 			
-			let run = document.createElement('button');
-			run.classList.add('run');
-			run.innerHTML = '<svg width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M22.0013,12.0016,6.002,21.0029V3Z"></path></svg>';
-			this._run = run;
+			let button = document.createElement('button');
+			button.classList.add('run');
+			button.innerHTML = '<svg width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M22.0013,12.0016,6.002,21.0029V3Z"></path></svg>';
+			this._run = button;
 
 			let panel = document.createElement('div');
 			panel.classList.add('md-navigation');
-			panel.appendChild(run);
+			panel.appendChild(button);
 
 			let shadowRoot = this.attachShadow({ mode: 'closed' });
 			shadowRoot.appendChild(style);
 			shadowRoot.appendChild(panel);
+
+			document.addEventListener("DOMContentLoaded", () => init(button));
 		}
 	}
 
-	customElements.define('md-navigation', MdNavigation);
+	customElements.define('md-navigation', MdNavigation); 
+
+	function init(button) {
+		let editor = document.getElementById('editor');
+		let console = document.getElementById('console');
+
+		if (editor && console) {
+			button.addEventListener('click', () => run(editor, console));
+		}
+	}
+
+	function run(editor, console) {
+		let tokens = Lexer.scan(editor.getValue(), true);
+		
+		try {
+			Parser.parse(tokens);
+		} catch (e) {
+			console.error(e);
+		}
+	}
 
 })();

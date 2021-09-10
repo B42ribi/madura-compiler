@@ -10,6 +10,7 @@ let MarkUp = (function() {
 			let item = document.createElement('span');
 			item.appendChild(document.createTextNode((t.type === LINEBREAK) ? NBSP : t.data));
 			line.appendChild(item);
+			item.id = `t${t.id}`;
 
 			switch (t.type) {
 				case KEYWORD:

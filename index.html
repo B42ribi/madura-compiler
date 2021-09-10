@@ -8,16 +8,16 @@
 	<script src="scripts/lexer.js"></script>
 	<script src="scripts/parser.js"></script>
 	<script src="scripts/markup.js"></script>
-	<script src="scripts/md-navigation.js"></script>
 	<script src="scripts/md-editor.js"></script>
+	<script src="scripts/md-navigation.js"></script>
 	<script src="scripts/md-console.js"></script>
 	<link rel="stylesheet" href="styles/main.css">
 </head>
 
 <body>
-	<md-navigation></md-navigation>
-	<md-editor src="source/hello-world.mdr"></md-editor>
-	<md-console></md-console>
+	<md-editor id="editor" src="source/hello-world.mdr"></md-editor>
+	<md-navigation id=navigation></md-navigation>
+	<md-console id="console"></md-console>
 </body>
 
 </html>
