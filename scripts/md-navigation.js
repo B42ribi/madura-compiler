@@ -41,11 +41,15 @@
 		let tokens = Lexer.scan(editor.getValue(), true);
 		
 		try {
-			let program = Parser.parse(tokens);
-			let main = program.functions['main'];
-			if (main) main();
+			let tree = Parser.parse(tokens);
+			console.print(JSON.stringify(tree));
 		} catch (e) {
-			console.error(e);
+			if (e.token) {
+				console.error(`${e.message}: ${e.token.data}`);
+				editor.underline(e.token.id);
+			} else {
+				console.error(e.message);
+			}
 		}
 	}
 
