@@ -41,14 +41,14 @@ let Parser = (function () {
 		let type;
 		
 		if (t.data === ':') {
-			type = type(tokens);
+			type = readType(tokens);
 			t = tokens.next();
 		}
 
 		let body;
 		switch (t.data) {
-			case '{': body = collect(tokens, readStatement, '}', '\n');
-			case '=>': body = [readStatement(tokens.next(), tokens)];
+			case '{': body = collect(tokens, readStatement, '}', '\n'); break;
+			case '=>': body = [readStatement(tokens.next(), tokens)]; break;
 		}
 
 		return new Function(name, params, type, body);
