@@ -42,7 +42,7 @@
 		
 		try {
 			let tree = Parser.parse(tokens);
-			console.print(JSON.stringify(tree));
+			console.print(tree.print());
 		} catch (e) {
 			if (e.token) {
 				console.error(`${e.message}: ${e.token.data}`);

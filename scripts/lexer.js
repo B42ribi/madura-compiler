@@ -134,12 +134,14 @@ const META = 8;
 const INVALID = 9;
 
 class Token {
-
 	constructor(type, data) {
 		this.type = type;
 		this.data = data;
 	}
 
+	print() {
+		return this.data;
+	}
 }
 
 const EXCLAMATION_MARK = 33;
